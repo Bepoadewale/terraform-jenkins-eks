@@ -22,13 +22,15 @@ module "vpc" {
   }
 }
 
+
 # SG
-module "sg" {
+module "vote_service_sg" {
   source = "terraform-aws-modules/security-group/aws"
 
   name        = "jenkins-sg"
-  description = "Security Group for Jenkins Server"
+  description = "Security group for Jenkins Server"
   vpc_id      = module.vpc.vpc_id
+
 
   ingress_with_cidr_blocks = [
     {
@@ -61,6 +63,7 @@ module "sg" {
   }
 }
 
+
 # EC2
 module "ec2_instance" {
   source = "terraform-aws-modules/ec2-instance/aws"
@@ -68,9 +71,9 @@ module "ec2_instance" {
   name = "Jenkins-Server"
 
   instance_type               = var.instance_type
-  key_name                    = "jenkins-server-key"
+  key_name                    = "windows-demo"
   monitoring                  = true
-  vpc_security_group_ids      = [module.sg.security_group_id]
+  vpc_security_group_ids      = [module.vote_service_sg.security_group_id]
   subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
   user_data                   = file("jenkins-install.sh")
